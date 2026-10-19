@@ -27,6 +27,9 @@ export default function PriseCommande() {
   const tablesQuery = useQuery({ queryKey: ["tables"], queryFn: listerTables });
   const table = tablesQuery.data?.find((t) => t.id === tableId);
 
+  // Diagnostic temporaire : à supprimer une fois le problème réglé
+  console.log("menus", menusQuery.data, menusQuery.error);
+
   const envoyer = useMutation({
     mutationFn: creerCommande,
     onSuccess: () => {
@@ -40,10 +43,18 @@ export default function PriseCommande() {
     const menus = (menusQuery.data ?? []).filter((m) =>
       m.nom.toLowerCase().includes(terme)
     );
-    return CATEGORIES.map((c) => ({
+
+    const groupes = CATEGORIES.map((c) => ({
       ...c,
       menus: menus.filter((m) => m.categorie === c.cle),
-    })).filter((c) => c.menus.length > 0);
+    }));
+
+    const autres = menus.filter(
+      (m) => !CATEGORIES.some((c) => c.cle === m.categorie)
+    );
+    if (autres.length > 0) groupes.push({ cle: "autres", libelle: "Autres", menus: autres });
+
+    return groupes.filter((g) => g.menus.length > 0);
   }, [menusQuery.data, recherche]);
 
   const total = lignes.reduce((somme, l) => somme + Number(l.menu.prix) * l.quantite, 0);
