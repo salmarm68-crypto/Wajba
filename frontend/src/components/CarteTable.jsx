@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const STATUTS = {
   libre: {
     libelle: "Libre",
@@ -26,9 +28,14 @@ const STATUTS_COMMANDE = {
 export default function CarteTable({ table }) {
   const statut = STATUTS[table.statut] ?? STATUTS.libre;
   const commande = table.commande_ouverte;
+  const libre = table.statut === "libre";
 
-  return (
-    <div className={`border rounded-lg p-4 bg-white/60 ${statut.carte}`}>
+  const carte = (
+    <div
+      className={`border rounded-lg p-4 bg-white/60 h-full ${statut.carte} ${
+        libre ? "hover:border-safran" : ""
+      }`}
+    >
       <div className="flex items-start justify-between gap-2">
         <h2 className="font-titre text-xl font-bold">Table {table.numero}</h2>
         <span className={`text-xs border rounded px-2 py-0.5 ${statut.badge}`}>
@@ -51,5 +58,13 @@ export default function CarteTable({ table }) {
         </div>
       )}
     </div>
+  );
+
+  if (!libre) return carte;
+
+  return (
+    <Link to={`/tables/${table.id}/commande`} className="block">
+      {carte}
+    </Link>
   );
 }

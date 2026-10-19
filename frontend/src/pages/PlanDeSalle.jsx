@@ -28,13 +28,16 @@ export default function PlanDeSalle() {
 
   return (
     <section>
-      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
         <h1 className="font-titre text-3xl font-bold">Plan de salle</h1>
         <p className="text-sm text-charbon/70">
           {libres} libre{libres > 1 ? "s" : ""} sur {tables.length} table
           {tables.length > 1 ? "s" : ""}
         </p>
       </div>
+      <p className="text-sm text-charbon/70 mb-6">
+        Choisissez une table libre pour prendre une commande.
+      </p>
 
       {tables.length === 0 ? (
         <p className="text-charbon/70">Aucune table pour le moment.</p>
