@@ -4,25 +4,41 @@ import { useAuth } from "../context/AuthContext";
 export default function Navbar() {
   const { serveur, deconnecter } = useAuth();
 
+  const liens = [
+    { to: "/", libelle: "Plan de salle", end: true },
+    { to: "/cuisine", libelle: "Cuisine" },
+    // Pages réservées au Gérant
+    ...(serveur.role === "gerant"
+      ? [
+          { to: "/gestion/menu", libelle: "Menu" },
+          { to: "/gestion/tables", libelle: "Tables" },
+          { to: "/gestion/serveurs", libelle: "Serveurs" },
+        ]
+      : []),
+  ];
+
   return (
     <header className="border-b border-charbon/15 bg-creme">
-      <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <span className="font-titre text-2xl font-bold">Wajba</span>
-          <nav>
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `text-sm font-medium pb-1 border-b-2 ${
-                  isActive
-                    ? "border-safran text-charbon"
-                    : "border-transparent text-charbon/60 hover:text-charbon"
-                }`
-              }
-            >
-              Plan de salle
-            </NavLink>
+          <nav className="flex flex-wrap items-center gap-5">
+            {liens.map((lien) => (
+              <NavLink
+                key={lien.to}
+                to={lien.to}
+                end={lien.end}
+                className={({ isActive }) =>
+                  `text-sm font-medium pb-1 border-b-2 ${
+                    isActive
+                      ? "border-safran text-charbon"
+                      : "border-transparent text-charbon/60 hover:text-charbon"
+                  }`
+                }
+              >
+                {lien.libelle}
+              </NavLink>
+            ))}
           </nav>
         </div>
 

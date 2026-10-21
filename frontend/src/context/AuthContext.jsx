@@ -18,6 +18,17 @@ export function AuthProvider({ children }) {
     setServeur(data.serveur);
   };
 
+  const inscrire = async (nom, email, password) => {
+    const { data } = await api.post("/register", {
+      nom,
+      email,
+      mot_de_passe: password,
+    });
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("serveur", JSON.stringify(data.serveur));
+    setServeur(data.serveur);
+  };
+
   const deconnecter = async () => {
     try {
       await api.post("/logout");
@@ -30,7 +41,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ serveur, connecter, deconnecter }}>
+    <AuthContext.Provider value={{ serveur, connecter, inscrire, deconnecter }}>
       {children}
     </AuthContext.Provider>
   );

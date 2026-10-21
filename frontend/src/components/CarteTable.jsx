@@ -33,7 +33,7 @@ export default function CarteTable({ table }) {
   const carte = (
     <div
       className={`border rounded-lg p-4 bg-white/60 h-full ${statut.carte} ${
-        libre ? "hover:border-safran" : ""
+        "hover:border-safran"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -60,10 +60,13 @@ export default function CarteTable({ table }) {
     </div>
   );
 
-  if (!libre) return carte;
+  if (!libre && !commande) return carte;
+
+  // Table libre : nouvelle commande. Table en service : détail de la commande.
+  const destination = libre ? `/tables/${table.id}/commande` : `/commandes/${commande.id}`;
 
   return (
-    <Link to={`/tables/${table.id}/commande`} className="block">
+    <Link to={destination} className="block">
       {carte}
     </Link>
   );

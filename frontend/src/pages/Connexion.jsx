@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Connexion() {
@@ -57,6 +57,13 @@ export default function Connexion() {
         >
           {chargement ? "Connexion…" : "Se connecter"}
         </button>
+
+        <p className="text-sm text-charbon/70 mt-4 text-center">
+          Pas encore de compte ?{" "}
+          <Link to="/inscription" className="underline hover:text-charbon">
+            Créer un compte
+          </Link>
+        </p>
       </form>
     </main>
   );

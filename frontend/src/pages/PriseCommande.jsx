@@ -27,9 +27,6 @@ export default function PriseCommande() {
   const tablesQuery = useQuery({ queryKey: ["tables"], queryFn: listerTables });
   const table = tablesQuery.data?.find((t) => t.id === tableId);
 
-  // Diagnostic temporaire : à supprimer une fois le problème réglé
-  console.log("menus", menusQuery.data, menusQuery.error);
-
   const envoyer = useMutation({
     mutationFn: creerCommande,
     onSuccess: () => {
