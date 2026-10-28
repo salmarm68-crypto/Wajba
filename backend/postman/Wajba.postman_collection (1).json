@@ -1,0 +1,2212 @@
+{
+  "info": {
+    "name": "Wajba API",
+    "description": "Tests de l'API Wajba (Laravel). Prérequis : base migrée et remplie (php artisan migrate --seed) et serveur lancé (php artisan serve). Lancer la collection dans l'ordre avec le Collection Runner.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api"
+    },
+    {
+      "key": "token_gerant",
+      "value": ""c:\Users\HYPER\Downloads\Wajba.postman_collection (1).json
+    },
+    {
+      "key": "token_serveur",
+      "value": ""
+    },
+    {
+      "key": "token_tmp",
+      "value": ""
+    },
+    {
+      "key": "email_test",
+      "value": ""
+    },
+    {
+      "key": "menu_id",
+      "value": ""
+    },
+    {
+      "key": "table_id",
+      "value": ""
+    },
+    {
+      "key": "table_numero",
+      "value": ""
+    },
+    {
+      "key": "commande_id",
+      "value": ""
+    },
+    {
+      "key": "serveur_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentification",
+      "item": [
+        {
+          "name": "Inscription d'un serveur",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('email_test', 'postman' + Date.now() + '@test.ma');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Le jeton est renvoyé, rôle serveur\", function () { const j = pm.response.json(); pm.expect(j.token).to.be.a('string'); pm.expect(j.serveur.role).to.eql('serveur'); pm.collectionVariables.set('token_tmp', j.token); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Serveur Postman\",\n  \"email\": \"{{email_test}}\",\n  \"mot_de_passe\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Inscription avec un e-mail déjà utilisé",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Erreur sur l'e-mail\", function () { pm.expect(pm.response.json().errors).to.have.property('email'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Doublon\",\n  \"email\": \"{{email_test}}\",\n  \"mot_de_passe\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Connexion Gérant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Jeton Gérant enregistré\", function () { const j = pm.response.json(); pm.expect(j.serveur.role).to.eql('gerant'); pm.collectionVariables.set('token_gerant', j.token); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerant@wajba.ma\",\n  \"mot_de_passe\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Connexion Serveur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Jeton Serveur enregistré\", function () { const j = pm.response.json(); pm.expect(j.serveur.role).to.eql('serveur'); pm.collectionVariables.set('token_serveur', j.token); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"serveur@wajba.ma\",\n  \"mot_de_passe\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Connexion avec des identifiants incorrects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Message d'erreur sur l'e-mail\", function () { pm.expect(pm.response.json().errors).to.have.property('email'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"serveur@wajba.ma\",\n  \"mot_de_passe\": \"mauvais\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Accès sans jeton (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Profil de l'utilisateur connecté",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"E-mail du serveur\", function () { pm.expect(pm.response.json().email).to.eql('serveur@wajba.ma'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Déconnexion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_tmp}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Menu",
+      "item": [
+        {
+          "name": "Liste du menu (Serveur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"La réponse est un tableau non vide\", function () { const j = pm.response.json(); pm.expect(j).to.be.an('array'); pm.expect(j.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer un plat (Gérant)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Plat créé et disponible\", function () { const j = pm.response.json(); pm.expect(j.disponible).to.eql(true); pm.collectionVariables.set('menu_id', j.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Plat test Postman\",\n  \"description\": \"Créé par la collection de tests\",\n  \"prix\": 100,\n  \"categorie\": \"plat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Créer un plat en tant que Serveur (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Interdit\",\n  \"prix\": 10,\n  \"categorie\": \"plat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Catégorie invalide (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"X\",\n  \"prix\": 10,\n  \"categorie\": \"inconnue\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Modifier le prix d'un plat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Nouveau prix\", function () { pm.expect(pm.response.json().prix).to.eql('105.00'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus/{{menu_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus",
+                "{{menu_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prix\": 105\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Rendre le plat indisponible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Plat indisponible\", function () { pm.expect(pm.response.json().disponible).to.eql(false); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus/{{menu_id}}/disponibilite",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus",
+                "{{menu_id}}",
+                "disponibilite"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Tables",
+      "item": [
+        {
+          "name": "Plan de salle (Serveur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Tableau de tables\", function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer une table (Gérant)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('table_numero', 100 + Math.floor(Math.random() * 800));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Table libre\", function () { const j = pm.response.json(); pm.expect(j.statut).to.eql('libre'); pm.collectionVariables.set('table_id', j.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"{{table_numero}}\",\n  \"capacite\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Créer une table en tant que Serveur (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": 999,\n  \"capacite\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Numéro de table en double (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"{{table_numero}}\",\n  \"capacite\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Modifier la capacité d'une table",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Capacité 6\", function () { pm.expect(pm.response.json().capacite).to.eql(6); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables/{{table_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables",
+                "{{table_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"capacite\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Commandes et cuisine",
+      "item": [
+        {
+          "name": "Commande avec un plat indisponible (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Erreur sur le plat\", function () { pm.expect(pm.response.json().errors).to.have.property('lignes.0.menu_id'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table_id\": \"{{table_id}}\",\n  \"lignes\": [\n    {\n      \"menu_id\": \"{{menu_id}}\",\n      \"quantite\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Rendre le plat à nouveau disponible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Plat disponible\", function () { pm.expect(pm.response.json().disponible).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus/{{menu_id}}/disponibilite",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus",
+                "{{menu_id}}",
+                "disponibilite"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer une commande (Serveur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Statut en_attente et total = 2 x 105 + TVA 10 % = 231\", function () { const d = pm.response.json().data; pm.expect(d.statut).to.eql('en_attente'); pm.expect(d.total).to.eql(231); pm.collectionVariables.set('commande_id', d.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table_id\": \"{{table_id}}\",\n  \"lignes\": [\n    {\n      \"menu_id\": \"{{menu_id}}\",\n      \"quantite\": 2,\n      \"note\": \"sans sel\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Même table déjà occupée (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });",
+                  "pm.test(\"Erreur sur la table\", function () { pm.expect(pm.response.json().errors).to.have.property('table_id'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table_id\": \"{{table_id}}\",\n  \"lignes\": [\n    {\n      \"menu_id\": \"{{menu_id}}\",\n      \"quantite\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Commandes en cours (écran cuisine)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"La commande de test est listée\", function () { const ids = pm.response.json().data.map(c => c.id); pm.expect(ids).to.include(parseInt(pm.collectionVariables.get('commande_id'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes?statut=en_cours",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes"
+              ],
+              "query": [
+                {
+                  "key": "statut",
+                  "value": "en_cours"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Détail d'une commande",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Une ligne avec note\", function () { const d = pm.response.json().data; pm.expect(d.lignes.length).to.eql(1); pm.expect(d.lignes[0].note).to.eql('sans sel'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Saut de statut interdit (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/statut",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "statut"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"servie\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Statut suivant : en préparation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"en_preparation\", function () { pm.expect(pm.response.json().data.statut).to.eql('en_preparation'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/statut",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "statut"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Statut suivant : prête",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"prete\", function () { pm.expect(pm.response.json().data.statut).to.eql('prete'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/statut",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "statut"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Statut suivant : servie",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"servie\", function () { pm.expect(pm.response.json().data.statut).to.eql('servie'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/statut",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "statut"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Plus de statut suivant (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/statut",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "statut"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Modifier les lignes de la commande",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Total = 3 x 105 + TVA 10 % = 346.5\", function () { pm.expect(pm.response.json().data.total).to.eql(346.5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lignes\": [\n    {\n      \"menu_id\": \"{{menu_id}}\",\n      \"quantite\": 3\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Addition et paiement",
+      "item": [
+        {
+          "name": "Demander l'addition",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Sous-total 315, TVA 31.5\", function () { const d = pm.response.json().data; pm.expect(d.sous_total).to.eql(315); pm.expect(d.tva).to.eql(31.5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/addition",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "addition"
+              ]
+            }
+          }
+        },
+        {
+          "name": "La table passe à « addition demandée »",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"addition_demandee\", function () { pm.expect(pm.response.json().statut).to.eql('addition_demandee'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables/{{table_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables",
+                "{{table_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remise supérieure au sous-total (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/remise",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "remise"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remise\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Appliquer une remise de 15 MAD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"(315 - 15) + TVA 30 = 330\", function () { const d = pm.response.json().data; pm.expect(d.tva).to.eql(30); pm.expect(d.total).to.eql(330); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/remise",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "remise"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remise\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Paiement sans mode de paiement (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/paiement",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "paiement"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Payer par carte",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Commande payée\", function () { const d = pm.response.json().data; pm.expect(d.statut).to.eql('payee'); pm.expect(d.mode_paiement).to.eql('carte'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}/paiement",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}",
+                "paiement"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode_paiement\": \"carte\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "La table est libérée",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"libre\", function () { pm.expect(pm.response.json().statut).to.eql('libre'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables/{{table_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables",
+                "{{table_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Modifier une commande payée (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 422\", function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/commandes/{{commande_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "commandes",
+                "{{commande_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lignes\": [\n    {\n      \"menu_id\": \"{{menu_id}}\",\n      \"quantite\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Serveurs (Gérant)",
+      "item": [
+        {
+          "name": "Liste des serveurs (Gérant)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Serveur de démonstration trouvé\", function () { const s = pm.response.json().find(x => x.email === 'serveur@wajba.ma'); pm.expect(s).to.exist; pm.collectionVariables.set('serveur_id', s.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/serveurs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "serveurs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Liste des serveurs en tant que Serveur (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/serveurs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "serveurs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Modifier un serveur",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Nom conservé\", function () { pm.expect(pm.response.json().nom).to.eql('Yassine Amrani'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/serveurs/{{serveur_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "serveurs",
+                "{{serveur_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Yassine Amrani\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Tableau de bord",
+      "item": [
+        {
+          "name": "Tableau de bord (Gérant)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Indicateurs présents\", function () { const j = pm.response.json(); pm.expect(j).to.have.property('chiffre_affaires_du_jour'); pm.expect(j).to.have.property('commandes_en_cours'); pm.expect(j.plats_populaires).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "dashboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tableau de bord en tant que Serveur (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_serveur}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "dashboard"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Nettoyage",
+      "item": [
+        {
+          "name": "Supprimer la table de test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tables/{{table_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tables",
+                "{{table_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Supprimer le plat de test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Code de réponse 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_gerant}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menus/{{menu_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menus",
+                "{{menu_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
