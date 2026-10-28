@@ -33,7 +33,7 @@ export default function Addition() {
     mutationFn: payerCommande,
     onSuccess: () => {
       rafraichir();
-      navigate("/");
+      navigate(`/commandes/${id}/ticket`);
     },
   });
 

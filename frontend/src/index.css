@@ -14,3 +14,16 @@ body {
   color: var(--color-charbon);
   font-family: var(--font-texte);
 }
+/* Impression du ticket : on masque la navigation et les boutons */
+@media print {
+  header,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  main {
+    padding: 0 !important;
+  }
+}

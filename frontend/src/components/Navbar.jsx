@@ -13,6 +13,7 @@ export default function Navbar() {
           { to: "/gestion/menu", libelle: "Menu" },
           { to: "/gestion/tables", libelle: "Tables" },
           { to: "/gestion/serveurs", libelle: "Serveurs" },
+          { to: "/tableau-de-bord", libelle: "Tableau de bord" },
         ]
       : []),
   ];

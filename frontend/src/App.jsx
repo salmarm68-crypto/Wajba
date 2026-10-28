@@ -11,6 +11,8 @@ import Addition from "./pages/Addition";
 import GestionMenu from "./pages/GestionMenu";
 import GestionTables from "./pages/GestionTables";
 import GestionServeurs from "./pages/GestionServeurs";
+import TableauDeBord from "./pages/TableauDeBord";
+import Ticket from "./pages/Ticket";
 
 export default function App() {
   return (
@@ -25,10 +27,12 @@ export default function App() {
           <Route path="/tables/:id/commande" element={<PriseCommande />} />
           <Route path="/commandes/:id" element={<DetailCommande />} />
           <Route path="/commandes/:id/addition" element={<Addition />} />
+          <Route path="/commandes/:id/ticket" element={<Ticket />} />
           <Route path="/cuisine" element={<Cuisine />} />
 
           {/* Gérant seulement : les autres rôles sont renvoyés vers le plan de salle */}
           <Route element={<RouteProtegee roles={["gerant"]} />}>
+            <Route path="/tableau-de-bord" element={<TableauDeBord />} />
             <Route path="/gestion/menu" element={<GestionMenu />} />
             <Route path="/gestion/tables" element={<GestionTables />} />
             <Route path="/gestion/serveurs" element={<GestionServeurs />} />
