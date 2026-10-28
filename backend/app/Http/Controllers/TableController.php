@@ -47,11 +47,24 @@ class TableController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'numero' => ['required', 'integer', 'min:1', 'unique:tables,numero'],
+            'numero' => [
+                'required', 'integer', 'min:1',
+                Rule::unique('tables', 'numero')->whereNull('deleted_at'),
+            ],
             'capacite' => ['required', 'integer', 'min:1', 'max:50'],
         ]);
 
-        $table = Table::create($data + ['statut' => StatutTable::Libre]);
+        // Le numéro d'une table supprimée peut être réutilisé : l'index unique de MySQL
+        // compte aussi les tables supprimées, donc on restaure l'ancienne ligne.
+        $supprimee = Table::onlyTrashed()->where('numero', $data['numero'])->first();
+
+        if ($supprimee) {
+            $supprimee->restore();
+            $supprimee->update(['capacite' => $data['capacite'], 'statut' => StatutTable::Libre]);
+            $table = $supprimee;
+        } else {
+            $table = Table::create($data + ['statut' => StatutTable::Libre]);
+        }
 
         return response()->json($table->refresh(), 201);
     }
