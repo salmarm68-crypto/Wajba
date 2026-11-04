@@ -72,7 +72,7 @@ export default function Cuisine() {
                           Table {c.table?.numero}
                         </Link>
                         <span className="text-xs text-charbon/70">
-                          #{c.id} · {heure(c.created_at)}
+                          n° {c.id} · {heure(c.created_at)}
                         </span>
                       </div>
                       <ul className="mt-2 space-y-1 text-sm">

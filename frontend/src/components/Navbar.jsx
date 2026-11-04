@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Logo from "./Logo";
+import Pastille from "./Pastille";
 
 export default function Navbar() {
   const { serveur, deconnecter } = useAuth();
@@ -22,7 +24,7 @@ export default function Navbar() {
     <header className="border-b border-charbon/15 bg-creme">
       <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-6">
-          <span className="font-titre text-2xl font-bold">Wajba</span>
+          <Logo />
           <nav className="flex flex-wrap items-center gap-5">
             {liens.map((lien) => (
               <NavLink
@@ -46,8 +48,8 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <p className="text-sm text-charbon/70 hidden sm:block">
             {serveur.nom ?? serveur.email}
-            <span className="ml-2 border border-charbon/20 rounded px-2 py-0.5 text-xs">
-              {serveur.role}
+            <span className="ml-2">
+              <Pastille>{serveur.role}</Pastille>
             </span>
           </p>
           <button

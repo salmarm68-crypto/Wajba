@@ -1,4 +1,8 @@
-export const mad = (valeur) => `${Number(valeur ?? 0).toFixed(2)} MAD`;
+export const mad = (valeur) =>
+  `${Number(valeur ?? 0).toLocaleString("fr-FR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} MAD`;
 
 export const STATUTS_COMMANDE = {
   en_attente: "En attente",

@@ -1,62 +1,49 @@
 import { Link } from "react-router-dom";
+import { mad, STATUTS_COMMANDE } from "../lib/statuts";
+import { depuis } from "../lib/temps";
+import Pastille from "./Pastille";
 
 const STATUTS = {
-  libre: {
-    libelle: "Libre",
-    badge: "text-emerald-800 border-emerald-700/40",
-    carte: "border-charbon/15",
-  },
-  occupee: {
-    libelle: "En service",
-    badge: "text-safran-fonce border-safran-fonce/50",
-    carte: "border-safran",
-  },
-  addition_demandee: {
-    libelle: "Addition demandée",
-    badge: "text-red-800 border-red-700/40",
-    carte: "border-red-700/50",
-  },
+  libre: { libelle: "Libre", ton: "vert" },
+  occupee: { libelle: "En service", ton: "ambre" },
+  addition_demandee: { libelle: "Addition demandée", ton: "rouge" },
 };
 
-const STATUTS_COMMANDE = {
-  en_attente: "En attente",
-  en_preparation: "En préparation",
-  prete: "Prête",
-  servie: "Servie",
-};
-
-export default function CarteTable({ table }) {
+export default function CarteTable({ table, maintenant }) {
   const statut = STATUTS[table.statut] ?? STATUTS.libre;
   const commande = table.commande_ouverte;
   const libre = table.statut === "libre";
 
+  const cadre = libre
+    ? "border-dashed border-charbon/25 bg-transparent"
+    : table.statut === "addition_demandee"
+      ? "border-brique/40 bg-white"
+      : "border-charbon/15 bg-white";
+
   const carte = (
-    <div
-      className={`border rounded-lg p-4 bg-white/60 h-full ${statut.carte} ${
-        "hover:border-safran"
-      }`}
-    >
+    <div className={`border rounded-xl p-5 h-full hover:border-safran ${cadre}`}>
       <div className="flex items-start justify-between gap-2">
-        <h2 className="font-titre text-xl font-bold">Table {table.numero}</h2>
-        <span className={`text-xs border rounded px-2 py-0.5 ${statut.badge}`}>
-          {statut.libelle}
-        </span>
+        <span className="font-titre text-5xl leading-none">{table.numero}</span>
+        <Pastille ton={statut.ton}>{statut.libelle}</Pastille>
       </div>
-      <p className="text-sm text-charbon/70 mt-1">
-        {table.capacite} {table.capacite > 1 ? "places" : "place"}
+      <p className="text-sm text-charbon/60 mt-3">
+        {table.capacite} {table.capacite > 1 ? "couverts" : "couvert"}
       </p>
 
-      {commande && (
-        <div className="text-sm mt-3 border-t border-charbon/10 pt-3 space-y-1">
-          <p className="font-medium">
-            {STATUTS_COMMANDE[commande.statut] ?? commande.statut}
-            <span className="text-charbon/70 font-normal">
-              {" "}· {Number(commande.total).toFixed(2)} MAD
-            </span>
-          </p>
-          <p className="text-charbon/70">{commande.serveur}</p>
-        </div>
-      )}
+      <div className="text-sm mt-4">
+        {commande ? (
+          <>
+            <p className="font-medium">
+              {depuis(commande.created_at, maintenant)} · {mad(commande.total)}
+            </p>
+            <p className="text-charbon/60 mt-0.5">
+              {STATUTS_COMMANDE[commande.statut] ?? commande.statut} · {commande.serveur}
+            </p>
+          </>
+        ) : (
+          libre && <p className="font-medium">Disponible</p>
+        )}
+      </div>
     </div>
   );
 

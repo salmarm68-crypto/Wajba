@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listerServeurs, modifierServeur, supprimerServeur } from "../api/serveurs";
 import { useAuth } from "../context/AuthContext";
 import { ROLES, messagesErreur } from "../lib/statuts";
+import Pastille from "../components/Pastille";
 
 export default function GestionServeurs() {
   const queryClient = useQueryClient();
@@ -151,8 +152,10 @@ export default function GestionServeurs() {
               <div>
                 <p className="font-medium">
                   {s.nom}
-                  <span className="ml-2 text-xs border border-charbon/30 rounded px-2 py-0.5">
-                    {libelleRole(s.role)}
+                  <span className="ml-2">
+                    <Pastille ton={s.role === "gerant" ? "ambre" : "neutre"}>
+                      {libelleRole(s.role)}
+                    </Pastille>
                   </span>
                   {s.id === moi?.id && (
                     <span className="ml-2 text-xs text-charbon/60">(vous)</span>

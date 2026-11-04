@@ -8,6 +8,7 @@ import {
   supprimerMenu,
 } from "../api/menus";
 import { CATEGORIES, mad, messagesErreur } from "../lib/statuts";
+import Pastille from "../components/Pastille";
 
 const VIDE = {
   id: null,
@@ -209,8 +210,8 @@ export default function GestionMenu() {
                   <p className="font-medium">
                     {menu.nom}
                     {!menu.disponible && (
-                      <span className="ml-2 text-xs border border-charbon/30 rounded px-2 py-0.5">
-                        Indisponible
+                      <span className="ml-2">
+                        <Pastille ton="rouge">Indisponible</Pastille>
                       </span>
                     )}
                   </p>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { creerTable, listerTables, modifierTable, supprimerTable } from "../api/tables";
 import { STATUTS_TABLE, messagesErreur } from "../lib/statuts";
+import Pastille from "../components/Pastille";
 
 const VIDE = { id: null, numero: "", capacite: "" };
 
@@ -116,9 +117,11 @@ export default function GestionTables() {
             <li key={table.id} className="border border-charbon/15 rounded-lg p-4 bg-white/60">
               <div className="flex items-start justify-between gap-2">
                 <h2 className="font-titre text-xl font-bold">Table {table.numero}</h2>
-                <span className="text-xs border border-charbon/30 rounded px-2 py-0.5">
+                <Pastille
+                  ton={table.statut === "libre" ? "vert" : table.statut === "occupee" ? "ambre" : "rouge"}
+                >
                   {STATUTS_TABLE[table.statut] ?? table.statut}
-                </span>
+                </Pastille>
               </div>
               <p className="text-sm text-charbon/70 mt-1">
                 {table.capacite} {table.capacite > 1 ? "places" : "place"}

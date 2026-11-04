@@ -110,10 +110,11 @@ export default function DetailCommande() {
         ← Plan de salle
       </Link>
 
-      <div className="flex flex-wrap items-center gap-3 mt-2">
-        <h1 className="font-titre text-3xl font-bold">
-          Commande #{commande.id} · Table {commande.table?.numero}
-        </h1>
+      <p className="text-xs uppercase tracking-[0.14em] text-charbon/60 mt-3">
+        Commande n° {commande.id}
+      </p>
+      <div className="flex flex-wrap items-center gap-3 mt-1">
+        <h1 className="font-titre text-4xl font-medium">Table {commande.table?.numero}</h1>
         <BadgeStatut statut={commande.statut} />
       </div>
       <p className="text-sm text-charbon/70 mt-1">Serveur : {commande.serveur?.nom}</p>

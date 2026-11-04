@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
 import { useAuth } from "../context/AuthContext";
 
 export default function Connexion() {
@@ -32,7 +33,9 @@ export default function Connexion() {
         onSubmit={soumettre}
         className="w-full max-w-sm border border-charbon/15 rounded-lg p-8 bg-white/60"
       >
-        <h1 className="font-titre text-3xl font-bold mb-1">Wajba</h1>
+        <h1 className="mb-2">
+          <Logo grand />
+        </h1>
         <p className="text-charbon/70 mb-6">Connectez-vous à votre compte.</p>
 
         <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
