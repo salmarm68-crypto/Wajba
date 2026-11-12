@@ -13,12 +13,45 @@ Projet de module **Programmation Web Dynamique S5 (IL)** — Faculté des Scienc
 
 ```
 Projet-web28/
-├── frontend/   (React)
-├── backend/    (Laravel)
+├── frontend/            (React, avec son Dockerfile)
+├── backend/             (Laravel, avec son Dockerfile)
+├── docker-compose.yml   (MySQL + API + interface)
 └── README.md
 ```
 
-## Installation du backend
+## Lancement avec Docker (recommandé)
+
+Prérequis : Docker Desktop (Windows ou Mac) ou Docker Engine avec le plugin Compose (Linux). Aucun autre outil à installer : PHP, Composer, Node et MySQL sont dans les conteneurs.
+
+```bash
+docker compose up --build
+```
+
+La première construction prend quelques minutes. Ensuite :
+
+| Service | Adresse |
+|---|---|
+| Interface (React) | http://localhost:5173 |
+| API (Laravel) | http://localhost:8000/api |
+| MySQL (depuis la machine) | `127.0.0.1:3307`, base `wajba`, utilisateur `root`, mot de passe `root` |
+
+Au démarrage, le conteneur `backend` crée le fichier `.env`, génère la clé de l'application, exécute les migrations et remplit la base avec les données de démonstration (une seule fois).
+
+Commandes utiles :
+
+```bash
+docker compose up -d --build                  # lancer en arrière-plan
+docker compose logs -f backend                # suivre les journaux de l'API
+docker compose exec backend php artisan test  # lancer les 33 tests Laravel
+docker compose down                           # arrêter
+docker compose down -v                        # arrêter et effacer la base (repartir de zéro)
+```
+
+Services du fichier `docker-compose.yml` : `db` (MySQL 8), `backend` (PHP 8.3 et Laravel 12) et `frontend` (Node 22 et Vite).
+
+## Installation sans Docker (Laragon, XAMPP...)
+
+### Installation du backend
 
 Prérequis : PHP 8.2 ou plus, Composer, MySQL (XAMPP, Laragon ou équivalent).
 
@@ -36,6 +69,18 @@ php artisan key:generate
 php artisan migrate --seed    # crée les tables et les données de démonstration
 php artisan serve             # API disponible sur http://localhost:8000/api
 ```
+
+### Installation du frontend
+
+Prérequis : Node.js 22 ou plus.
+
+```bash
+cd frontend
+npm install
+npm run dev                   # interface disponible sur http://localhost:5173
+```
+
+L'adresse de l'API est définie dans `frontend/.env` (`VITE_API_URL=http://localhost:8000/api`).
 
 ## Comptes de démonstration
 

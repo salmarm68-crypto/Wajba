@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { lireTableauDeBord } from "../api/dashboard";
 import { mad } from "../lib/statuts";
+import { localeDates } from "../i18n";
 
 function Indicateur({ titre, valeur, detail }) {
   return (
-    <div className="border border-charbon/15 rounded-lg p-5 bg-white/60">
+    <div className="border border-charbon/15 rounded-lg p-5 bg-carte/60">
       <p className="text-sm text-charbon/70">{titre}</p>
       <p className="font-titre text-3xl font-bold mt-2">{valeur}</p>
       {detail && <p className="text-sm text-charbon/60 mt-1">{detail}</p>}
@@ -14,15 +15,18 @@ function Indicateur({ titre, valeur, detail }) {
 }
 
 export default function TableauDeBord() {
+  const { t } = useTranslation();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dashboard"],
     queryFn: lireTableauDeBord,
     refetchInterval: 30000,
   });
 
-  const [aujourdhui] = useState(() =>
-    new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
-  );
+  const aujourdhui = new Date().toLocaleDateString(localeDates(), {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   const plats = data?.plats_populaires ?? [];
   const maximum = Math.max(1, ...plats.map((p) => Number(p.quantite)));
@@ -30,12 +34,12 @@ export default function TableauDeBord() {
   return (
     <section>
       <div className="flex flex-wrap items-end justify-between gap-2">
-        <h1 className="font-titre text-3xl font-bold">Tableau de bord</h1>
+        <h1 className="font-titre text-3xl font-bold">{t("Tableau de bord")}</h1>
         <p className="text-sm text-charbon/70 capitalize">{aujourdhui}</p>
       </div>
 
-      {isLoading && <p className="text-charbon/70 mt-8">Chargement…</p>}
-      {isError && <p className="text-red-700 mt-8">Impossible de charger le tableau de bord.</p>}
+      {isLoading && <p className="text-charbon/70 mt-8">{t("Chargement…")}</p>}
+      {isError && <p className="text-red-700 mt-8">{t("Impossible de charger le tableau de bord.")}</p>}
 
       {data && (
         <>
@@ -62,10 +66,10 @@ export default function TableauDeBord() {
             />
           </div>
 
-          <h2 className="font-titre text-xl font-bold mt-10 mb-4">Plats les plus vendus</h2>
+          <h2 className="font-titre text-xl font-bold mt-10 mb-4">{t("Plats les plus vendus")}</h2>
 
           {plats.length === 0 ? (
-            <p className="text-charbon/70">Aucune vente pour le moment.</p>
+            <p className="text-charbon/70">{t("Aucune vente pour le moment.")}</p>
           ) : (
             <ol className="space-y-3 max-w-2xl">
               {plats.map((plat, index) => (

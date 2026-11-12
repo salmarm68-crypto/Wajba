@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -21,6 +22,7 @@ const VIDE = {
 };
 
 export default function GestionMenu() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [formulaire, setFormulaire] = useState(VIDE);
   const [recherche, setRecherche] = useState("");
@@ -79,7 +81,7 @@ export default function GestionMenu() {
   };
 
   const confirmerSuppression = (menu) => {
-    if (window.confirm(`Supprimer « ${menu.nom} » du menu ?`)) supprimer.mutate(menu.id);
+    if (window.confirm(t("Supprimer « {{nom}} » du menu ?", { nom: menu.nom }))) supprimer.mutate(menu.id);
   };
 
   const erreurs = [enregistrer, basculer, supprimer]
@@ -90,21 +92,21 @@ export default function GestionMenu() {
 
   return (
     <section>
-      <h1 className="font-titre text-3xl font-bold">Gestion du menu</h1>
+      <h1 className="font-titre text-3xl font-bold">{t("Gestion du menu")}</h1>
       <p className="text-sm text-charbon/70 mt-1">
-        Ajoutez, modifiez ou retirez des plats. Un plat indisponible ne peut plus être commandé.
+        {t("Ajoutez, modifiez ou retirez des plats. Un plat indisponible ne peut plus être commandé.")}
       </p>
 
       <form
         onSubmit={soumettre}
-        className="mt-6 border border-charbon/15 rounded-lg p-4 bg-white/60 grid sm:grid-cols-2 gap-4"
+        className="mt-6 border border-charbon/15 rounded-lg p-4 bg-carte/60 grid sm:grid-cols-2 gap-4"
       >
         <h2 className="font-titre text-xl font-bold sm:col-span-2">
-          {formulaire.id ? "Modifier le plat" : "Nouveau plat"}
+          {formulaire.id ? t("Modifier le plat") : t("Nouveau plat")}
         </h2>
 
         <div>
-          <label htmlFor="nom" className="block text-sm font-medium mb-1">Nom</label>
+          <label htmlFor="nom" className="block text-sm font-medium mb-1">{t("Nom")}</label>
           <input
             id="nom" required maxLength={120} value={formulaire.nom}
             onChange={(e) => champ("nom", e.target.value)} className={saisie}
@@ -112,7 +114,7 @@ export default function GestionMenu() {
         </div>
 
         <div>
-          <label htmlFor="prix" className="block text-sm font-medium mb-1">Prix (MAD)</label>
+          <label htmlFor="prix" className="block text-sm font-medium mb-1">{t("Prix (MAD)")}</label>
           <input
             id="prix" type="number" min="0" step="0.01" required value={formulaire.prix}
             onChange={(e) => champ("prix", e.target.value)} className={saisie}
@@ -120,20 +122,20 @@ export default function GestionMenu() {
         </div>
 
         <div>
-          <label htmlFor="categorie" className="block text-sm font-medium mb-1">Catégorie</label>
+          <label htmlFor="categorie" className="block text-sm font-medium mb-1">{t("Catégorie")}</label>
           <select
             id="categorie" value={formulaire.categorie}
             onChange={(e) => champ("categorie", e.target.value)} className={saisie}
           >
             {CATEGORIES.map((c) => (
-              <option key={c.cle} value={c.cle}>{c.libelle}</option>
+              <option key={c.cle} value={c.cle}>{t(c.libelle)}</option>
             ))}
           </select>
         </div>
 
         <div>
           <label htmlFor="image" className="block text-sm font-medium mb-1">
-            Image (adresse, facultatif)
+            {t("Image (adresse, facultatif)")}
           </label>
           <input
             id="image" value={formulaire.image}
@@ -143,7 +145,7 @@ export default function GestionMenu() {
 
         <div className="sm:col-span-2">
           <label htmlFor="description" className="block text-sm font-medium mb-1">
-            Description
+            {t("Description")}
           </label>
           <textarea
             id="description" rows={2} value={formulaire.description}
@@ -156,7 +158,7 @@ export default function GestionMenu() {
             type="checkbox" checked={formulaire.disponible}
             onChange={(e) => champ("disponible", e.target.checked)}
           />
-          Plat disponible
+          {t("Plat disponible")}
         </label>
 
         {erreurs.length > 0 && (
@@ -170,16 +172,16 @@ export default function GestionMenu() {
         <div className="flex gap-3 sm:col-span-2">
           <button
             type="submit" disabled={enregistrer.isPending}
-            className="bg-safran text-charbon font-medium rounded-md px-4 py-2 hover:brightness-95 disabled:opacity-50"
+            className="bg-safran text-sur-safran font-medium rounded-md px-4 py-2 hover:brightness-95 disabled:opacity-50"
           >
-            {formulaire.id ? "Enregistrer les modifications" : "Ajouter le plat"}
+            {formulaire.id ? t("Enregistrer les modifications") : t("Ajouter le plat")}
           </button>
           {formulaire.id && (
             <button
               type="button" onClick={() => setFormulaire(VIDE)}
               className="border border-charbon/30 rounded-md px-4 py-2 text-sm"
             >
-              Annuler
+              {t("Annuler")}
             </button>
           )}
         </div>
@@ -187,31 +189,31 @@ export default function GestionMenu() {
 
       <input
         type="search" value={recherche} onChange={(e) => setRecherche(e.target.value)}
-        placeholder="Rechercher un plat"
+        placeholder={t("Rechercher un plat")}
         className="w-full border border-charbon/20 rounded-md px-3 py-2 mt-8 mb-6 bg-transparent"
       />
 
-      {isLoading && <p className="text-charbon/70">Chargement…</p>}
-      {isError && <p className="text-red-700">Impossible de charger le menu.</p>}
+      {isLoading && <p className="text-charbon/70">{t("Chargement…")}</p>}
+      {isError && <p className="text-red-700">{t("Impossible de charger le menu.")}</p>}
       {!isLoading && !isError && groupes.length === 0 && (
-        <p className="text-charbon/70">Aucun plat.</p>
+        <p className="text-charbon/70">{t("Aucun plat.")}</p>
       )}
 
       {groupes.map((groupe) => (
         <div key={groupe.cle} className="mb-8">
-          <h2 className="font-titre text-xl font-bold mb-3">{groupe.libelle}</h2>
+          <h2 className="font-titre text-xl font-bold mb-3">{t(groupe.libelle)}</h2>
           <ul className="space-y-2">
             {groupe.menus.map((menu) => (
               <li
                 key={menu.id}
-                className="border border-charbon/15 rounded-lg p-3 bg-white/60 flex flex-wrap items-center justify-between gap-3"
+                className="border border-charbon/15 rounded-lg p-3 bg-carte/60 flex flex-wrap items-center justify-between gap-3"
               >
                 <div className={menu.disponible ? "" : "opacity-60"}>
                   <p className="font-medium">
                     {menu.nom}
                     {!menu.disponible && (
                       <span className="ml-2">
-                        <Pastille ton="rouge">Indisponible</Pastille>
+                        <Pastille ton="rouge">{t("Indisponible")}</Pastille>
                       </span>
                     )}
                   </p>
@@ -226,21 +228,21 @@ export default function GestionMenu() {
                     onClick={() => modifier(menu)}
                     className="border border-charbon/30 rounded-md px-3 py-1.5 hover:bg-charbon/5"
                   >
-                    Modifier
+                    {t("Modifier")}
                   </button>
                   <button
                     onClick={() => basculer.mutate(menu.id)}
                     disabled={basculer.isPending}
                     className="border border-charbon/30 rounded-md px-3 py-1.5 hover:bg-charbon/5 disabled:opacity-50"
                   >
-                    {menu.disponible ? "Rendre indisponible" : "Rendre disponible"}
+                    {menu.disponible ? t("Rendre indisponible") : t("Rendre disponible")}
                   </button>
                   <button
                     onClick={() => confirmerSuppression(menu)}
                     disabled={supprimer.isPending}
                     className="text-red-800 border border-red-700/30 rounded-md px-3 py-1.5 hover:bg-red-50 disabled:opacity-50"
                   >
-                    Supprimer
+                    {t("Supprimer")}
                   </button>
                 </div>
               </li>

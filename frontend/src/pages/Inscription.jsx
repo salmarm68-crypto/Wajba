@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
@@ -5,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { messagesErreur } from "../lib/statuts";
 
 export default function Inscription() {
+  const { t } = useTranslation();
   const { serveur, inscrire } = useAuth();
   const navigate = useNavigate();
   const [nom, setNom] = useState("");
@@ -35,27 +37,27 @@ export default function Inscription() {
     <main className="min-h-screen flex items-center justify-center p-6">
       <form
         onSubmit={soumettre}
-        className="w-full max-w-sm border border-charbon/15 rounded-lg p-8 bg-white/60"
+        className="w-full max-w-sm border border-charbon/15 rounded-lg p-8 bg-carte/60"
       >
         <h1 className="mb-2">
           <Logo grand />
         </h1>
-        <p className="text-charbon/70 mb-6">Créez votre compte serveur.</p>
+        <p className="text-charbon/70 mb-6">{t("Créez votre compte serveur.")}</p>
 
-        <label className="block text-sm font-medium mb-1" htmlFor="nom">Nom complet</label>
+        <label className="block text-sm font-medium mb-1" htmlFor="nom">{t("Nom complet")}</label>
         <input
           id="nom" type="text" required maxLength={100} value={nom}
           onChange={(e) => setNom(e.target.value)} className={champ}
         />
 
-        <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
+        <label className="block text-sm font-medium mb-1" htmlFor="email">{t("E-mail")}</label>
         <input
           id="email" type="email" required value={email}
           onChange={(e) => setEmail(e.target.value)} className={champ}
         />
 
         <label className="block text-sm font-medium mb-1" htmlFor="password">
-          Mot de passe (8 caractères minimum)
+          {t("Mot de passe (8 caractères minimum)")}
         </label>
         <input
           id="password" type="password" required minLength={8} value={password}
@@ -72,15 +74,15 @@ export default function Inscription() {
 
         <button
           type="submit" disabled={chargement}
-          className="w-full bg-safran text-charbon font-medium rounded-md py-2 hover:brightness-95 disabled:opacity-60"
+          className="w-full bg-safran text-sur-safran font-medium rounded-md py-2 hover:brightness-95 disabled:opacity-60"
         >
-          {chargement ? "Création…" : "Créer mon compte"}
+          {chargement ? t("Création…") : t("Créer mon compte")}
         </button>
 
         <p className="text-sm text-charbon/70 mt-4 text-center">
           Déjà un compte ?{" "}
           <Link to="/connexion" className="underline hover:text-charbon">
-            Se connecter
+            {t("Se connecter")}
           </Link>
         </p>
       </form>

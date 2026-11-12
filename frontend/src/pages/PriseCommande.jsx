@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { CATEGORIES, mad, messagesErreur } from "../lib/statuts";
 const SINGULIER = { entree: "Entrée", plat: "Plat", dessert: "Dessert", boisson: "Boisson" };
 
 export default function PriseCommande() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const tableId = Number(id);
   const navigate = useNavigate();
@@ -85,13 +87,13 @@ export default function PriseCommande() {
   };
 
   if (menusQuery.isLoading || tablesQuery.isLoading)
-    return <p className="text-charbon/70">Chargement…</p>;
+    return <p className="text-charbon/70">{t("Chargement…")}</p>;
 
   if (menusQuery.isError || tablesQuery.isError || !table)
     return (
       <div>
-        <p className="text-red-700 mb-3">Table ou menu introuvable.</p>
-        <Link to="/" className="underline">Retour au plan de salle</Link>
+        <p className="text-red-700 mb-3">{t("Table ou menu introuvable.")}</p>
+        <Link to="/" className="underline">{t("Retour au plan de salle")}</Link>
       </div>
     );
 
@@ -99,19 +101,19 @@ export default function PriseCommande() {
     return (
       <div>
         <p className="mb-3">La table {table.numero} n'est pas libre.</p>
-        <Link to="/" className="underline">Retour au plan de salle</Link>
+        <Link to="/" className="underline">{t("Retour au plan de salle")}</Link>
       </div>
     );
 
   return (
     <section>
       <Link to="/" className="text-sm text-charbon/70 hover:text-charbon">
-        ← Plan de salle
+        {t("← Plan de salle")}
       </Link>
       <p className="text-xs uppercase tracking-[0.14em] text-charbon/60 mt-3">
-        Table {table.numero} · {table.capacite} {table.capacite > 1 ? "couverts" : "couvert"}
+        {t("Table")} {table.numero} · {table.capacite} {table.capacite > 1 ? t("couverts") : t("couvert")}
       </p>
-      <h1 className="font-titre text-4xl font-medium mt-1">Prise de commande</h1>
+      <h1 className="font-titre text-4xl font-medium mt-1">{t("Prise de commande")}</h1>
 
       <div className="grid lg:grid-cols-[1fr_22rem] gap-8 mt-6">
         <div>
@@ -119,11 +121,11 @@ export default function PriseCommande() {
             type="search"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher un plat"
-            className="w-full border border-charbon/15 rounded-full px-5 py-2.5 mb-4 bg-white/60"
+            placeholder={t("Rechercher un plat")}
+            className="w-full border border-charbon/15 rounded-full px-5 py-2.5 mb-4 bg-carte/60"
           />
 
-          <div className="flex flex-wrap gap-2 mb-6" role="tablist" aria-label="Catégories">
+          <div className="flex flex-wrap gap-2 mb-6" role="tablist" aria-label={t("Catégories")}>
             {CATEGORIES.map((c) => {
               const active = !terme && c.cle === categorieActive;
               return (
@@ -138,10 +140,10 @@ export default function PriseCommande() {
                   className={`rounded-full border px-5 py-2 text-sm transition-colors ${
                     active
                       ? "bg-safran border-safran text-charbon font-medium"
-                      : "border-charbon/15 bg-white/60 text-charbon/70 hover:border-safran"
+                      : "border-charbon/15 bg-carte/60 text-charbon/70 hover:border-safran"
                   }`}
                 >
-                  {c.libelle}
+                  {t(c.libelle)}
                 </button>
               );
             })}
@@ -149,7 +151,7 @@ export default function PriseCommande() {
 
           {visibles.length === 0 && (
             <p className="text-charbon/70">
-              {terme ? "Aucun plat ne correspond à la recherche." : "Aucun plat dans cette catégorie."}
+              {terme ? t("Aucun plat ne correspond à la recherche.") : t("Aucun plat dans cette catégorie.")}
             </p>
           )}
 
@@ -164,11 +166,11 @@ export default function PriseCommande() {
                       ? "border-charbon/10 bg-white/40 opacity-60"
                       : quantite > 0
                         ? "border-safran bg-safran/10"
-                        : "border-charbon/15 bg-white"
+                        : "border-charbon/15 bg-carte"
                   }`}
                 >
                   <p className="text-[11px] uppercase tracking-[0.14em] text-charbon/50">
-                    {SINGULIER[menu.categorie] ?? menu.categorie}
+                    {t(SINGULIER[menu.categorie] ?? menu.categorie)}
                   </p>
                   <h3 className="font-titre text-xl font-semibold mt-1">{menu.nom}</h3>
                   {menu.description && (
@@ -179,7 +181,7 @@ export default function PriseCommande() {
                     <p className="flex items-center gap-2">
                       <span>{mad(menu.prix)}</span>
                       {quantite > 0 && (
-                        <span className="rounded-full bg-safran text-charbon text-xs font-semibold px-2.5 py-0.5">
+                        <span className="rounded-full bg-safran text-sur-safran text-xs font-semibold px-2.5 py-0.5">
                           × {quantite}
                         </span>
                       )}
@@ -187,7 +189,7 @@ export default function PriseCommande() {
                     {menu.disponible ? (
                       <button
                         onClick={() => ajouter(menu)}
-                        aria-label={`Ajouter ${menu.nom}`}
+                        aria-label={`${t("Ajouter")} ${menu.nom}`}
                         className={`shrink-0 w-10 h-10 rounded-full border text-xl leading-none transition-colors ${
                           quantite > 0
                             ? "bg-safran border-safran text-charbon"
@@ -197,7 +199,7 @@ export default function PriseCommande() {
                         +
                       </button>
                     ) : (
-                      <Pastille ton="rouge">Indisponible</Pastille>
+                      <Pastille ton="rouge">{t("Indisponible")}</Pastille>
                     )}
                   </div>
                 </article>
@@ -206,14 +208,14 @@ export default function PriseCommande() {
           </div>
         </div>
 
-        <aside className="lg:sticky lg:top-6 self-start rounded-xl border border-charbon/15 p-5 bg-white">
+        <aside className="lg:sticky lg:top-6 self-start rounded-xl border border-charbon/15 p-5 bg-carte">
           <div className="flex items-center justify-between gap-3 mb-3">
             <h2 className="font-titre text-2xl font-medium">Table {table.numero}</h2>
-            <Pastille ton="ambre">Nouvelle commande</Pastille>
+            <Pastille ton="ambre">{t("Nouvelle commande")}</Pastille>
           </div>
 
           {lignes.length === 0 ? (
-            <p className="text-sm text-charbon/60">Aucun plat ajouté.</p>
+            <p className="text-sm text-charbon/60">{t("Aucun plat ajouté.")}</p>
           ) : (
             <ul>
               {lignes.map((l) => (
@@ -223,7 +225,7 @@ export default function PriseCommande() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => changerQuantite(l.menu.id, -1)}
-                        aria-label="Diminuer la quantité"
+                        aria-label={t("Diminuer la quantité")}
                         className="w-8 h-8 rounded-lg border border-charbon/20 hover:border-safran"
                       >
                         −
@@ -231,7 +233,7 @@ export default function PriseCommande() {
                       <span className="w-6 text-center text-sm">{l.quantite}</span>
                       <button
                         onClick={() => changerQuantite(l.menu.id, 1)}
-                        aria-label="Augmenter la quantité"
+                        aria-label={t("Augmenter la quantité")}
                         className="w-8 h-8 rounded-lg border border-charbon/20 hover:border-safran"
                       >
                         +
@@ -243,7 +245,7 @@ export default function PriseCommande() {
                     type="text"
                     value={l.note}
                     onChange={(e) => changerNote(l.menu.id, e.target.value)}
-                    placeholder="Note (ex. sans oignon)"
+                    placeholder={t("Note (ex. sans oignon)")}
                     className="w-full border border-charbon/15 rounded-lg px-2.5 py-1 mt-2 text-sm bg-transparent"
                   />
                 </li>
@@ -253,15 +255,15 @@ export default function PriseCommande() {
 
           <div className="border-t border-charbon/10 mt-3 pt-3 space-y-1 text-sm">
             <p className="flex justify-between text-charbon/70">
-              <span>Sous-total</span>
+              <span>{t("Sous-total")}</span>
               <span>{mad(sousTotal)}</span>
             </p>
             <p className="flex justify-between text-charbon/70">
-              <span>TVA 10 %</span>
+              <span>{t("TVA 10 %")}</span>
               <span>{mad(tva)}</span>
             </p>
             <p className="flex justify-between items-baseline pt-1">
-              <span className="font-semibold">Total</span>
+              <span className="font-semibold">{t("Total")}</span>
               <span className="font-titre text-xl font-semibold text-safran-fonce">{mad(total)}</span>
             </p>
           </div>
@@ -277,9 +279,9 @@ export default function PriseCommande() {
           <button
             onClick={soumettre}
             disabled={lignes.length === 0 || envoyer.isPending}
-            className="w-full mt-4 bg-safran text-charbon font-medium rounded-lg py-2.5 hover:brightness-95 disabled:opacity-50"
+            className="w-full mt-4 bg-safran text-sur-safran font-medium rounded-lg py-2.5 hover:brightness-95 disabled:opacity-50"
           >
-            {envoyer.isPending ? "Envoi…" : "Envoyer en cuisine"}
+            {envoyer.isPending ? t("Envoi…") : t("Envoyer en cuisine")}
           </button>
         </aside>
       </div>

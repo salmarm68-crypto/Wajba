@@ -1,0 +1,57 @@
+# Wajba : base MySQL, API Laravel et interface React lancées avec une seule commande :
+#   docker compose up --build
+services:
+  db:
+    image: mysql:8.0
+    container_name: wajba-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wajba
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"   # 3307 sur la machine, pour ne pas entrer en conflit avec un MySQL local
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ./backend
+    container_name: wajba-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: wajba
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      FRONTEND_URL: http://localhost:5173
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: wajba-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8000/api
+    ports:
+      - "5173:5173"
+
+volumes:
+  db_data:

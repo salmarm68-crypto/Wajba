@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { creerTable, listerTables, modifierTable, supprimerTable } from "../api/tables";
@@ -7,6 +8,7 @@ import Pastille from "../components/Pastille";
 const VIDE = { id: null, numero: "", capacite: "" };
 
 export default function GestionTables() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [formulaire, setFormulaire] = useState(VIDE);
 
@@ -37,7 +39,7 @@ export default function GestionTables() {
   };
 
   const confirmerSuppression = (table) => {
-    if (window.confirm(`Supprimer la table ${table.numero} ?`)) supprimer.mutate(table.id);
+    if (window.confirm(t("Supprimer la table {{numero}} ?", { numero: table.numero }))) supprimer.mutate(table.id);
   };
 
   const erreurs = [enregistrer, supprimer]
@@ -48,22 +50,21 @@ export default function GestionTables() {
 
   return (
     <section>
-      <h1 className="font-titre text-3xl font-bold">Gestion des tables</h1>
+      <h1 className="font-titre text-3xl font-bold">{t("Gestion des tables")}</h1>
       <p className="text-sm text-charbon/70 mt-1">
-        Le statut d'une table change automatiquement avec les commandes. Une table qui a une
-        commande ouverte ne peut pas être supprimée.
+        {t("Le statut d'une table change automatiquement avec les commandes. Une table qui a une commande ouverte ne peut pas être supprimée.")}
       </p>
 
       <form
         onSubmit={soumettre}
-        className="mt-6 border border-charbon/15 rounded-lg p-4 bg-white/60 grid sm:grid-cols-2 gap-4 max-w-2xl"
+        className="mt-6 border border-charbon/15 rounded-lg p-4 bg-carte/60 grid sm:grid-cols-2 gap-4 max-w-2xl"
       >
         <h2 className="font-titre text-xl font-bold sm:col-span-2">
-          {formulaire.id ? "Modifier la table" : "Nouvelle table"}
+          {formulaire.id ? t("Modifier la table") : t("Nouvelle table")}
         </h2>
 
         <div>
-          <label htmlFor="numero" className="block text-sm font-medium mb-1">Numéro</label>
+          <label htmlFor="numero" className="block text-sm font-medium mb-1">{t("Numéro")}</label>
           <input
             id="numero" type="number" min="1" required value={formulaire.numero}
             onChange={(e) => setFormulaire((f) => ({ ...f, numero: e.target.value }))}
@@ -73,7 +74,7 @@ export default function GestionTables() {
 
         <div>
           <label htmlFor="capacite" className="block text-sm font-medium mb-1">
-            Nombre de places
+            {t("Nombre de places")}
           </label>
           <input
             id="capacite" type="number" min="1" max="50" required value={formulaire.capacite}
@@ -93,34 +94,34 @@ export default function GestionTables() {
         <div className="flex gap-3 sm:col-span-2">
           <button
             type="submit" disabled={enregistrer.isPending}
-            className="bg-safran text-charbon font-medium rounded-md px-4 py-2 hover:brightness-95 disabled:opacity-50"
+            className="bg-safran text-sur-safran font-medium rounded-md px-4 py-2 hover:brightness-95 disabled:opacity-50"
           >
-            {formulaire.id ? "Enregistrer les modifications" : "Ajouter la table"}
+            {formulaire.id ? t("Enregistrer les modifications") : t("Ajouter la table")}
           </button>
           {formulaire.id && (
             <button
               type="button" onClick={() => setFormulaire(VIDE)}
               className="border border-charbon/30 rounded-md px-4 py-2 text-sm"
             >
-              Annuler
+              {t("Annuler")}
             </button>
           )}
         </div>
       </form>
 
-      {isLoading && <p className="text-charbon/70 mt-8">Chargement…</p>}
-      {isError && <p className="text-red-700 mt-8">Impossible de charger les tables.</p>}
+      {isLoading && <p className="text-charbon/70 mt-8">{t("Chargement…")}</p>}
+      {isError && <p className="text-red-700 mt-8">{t("Impossible de charger les tables.")}</p>}
 
       {tables && (
         <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
           {tables.map((table) => (
-            <li key={table.id} className="border border-charbon/15 rounded-lg p-4 bg-white/60">
+            <li key={table.id} className="border border-charbon/15 rounded-lg p-4 bg-carte/60">
               <div className="flex items-start justify-between gap-2">
                 <h2 className="font-titre text-xl font-bold">Table {table.numero}</h2>
                 <Pastille
                   ton={table.statut === "libre" ? "vert" : table.statut === "occupee" ? "ambre" : "rouge"}
                 >
-                  {STATUTS_TABLE[table.statut] ?? table.statut}
+                  {t(STATUTS_TABLE[table.statut] ?? table.statut)}
                 </Pastille>
               </div>
               <p className="text-sm text-charbon/70 mt-1">
@@ -138,14 +139,14 @@ export default function GestionTables() {
                   }
                   className="border border-charbon/30 rounded-md px-3 py-1.5 hover:bg-charbon/5"
                 >
-                  Modifier
+                  {t("Modifier")}
                 </button>
                 <button
                   onClick={() => confirmerSuppression(table)}
                   disabled={supprimer.isPending}
                   className="text-red-800 border border-red-700/30 rounded-md px-3 py-1.5 hover:bg-red-50 disabled:opacity-50"
                 >
-                  Supprimer
+                  {t("Supprimer")}
                 </button>
               </div>
             </li>

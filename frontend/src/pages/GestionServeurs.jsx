@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listerServeurs, modifierServeur, supprimerServeur } from "../api/serveurs";
@@ -6,6 +7,7 @@ import { ROLES, messagesErreur } from "../lib/statuts";
 import Pastille from "../components/Pastille";
 
 export default function GestionServeurs() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { serveur: moi } = useAuth();
   const [edition, setEdition] = useState(null);
@@ -39,7 +41,7 @@ export default function GestionServeurs() {
   };
 
   const confirmerSuppression = (serveur) => {
-    if (window.confirm(`Supprimer le compte de ${serveur.nom} ?`)) supprimer.mutate(serveur.id);
+    if (window.confirm(t("Supprimer le compte de {{nom}} ?", { nom: serveur.nom }))) supprimer.mutate(serveur.id);
   };
 
   const erreurs = [enregistrer, supprimer]
@@ -51,21 +53,20 @@ export default function GestionServeurs() {
 
   return (
     <section>
-      <h1 className="font-titre text-3xl font-bold">Gestion des serveurs</h1>
+      <h1 className="font-titre text-3xl font-bold">{t("Gestion des serveurs")}</h1>
       <p className="text-sm text-charbon/70 mt-1">
-        Les nouveaux serveurs créent leur compte depuis la page d'inscription. Vous pouvez
-        ensuite modifier leurs informations, changer leur rôle ou supprimer leur compte.
+        {t("Les nouveaux serveurs créent leur compte depuis la page d'inscription. Vous pouvez ensuite modifier leurs informations, changer leur rôle ou supprimer leur compte.")}
       </p>
 
       {edition && (
         <form
           onSubmit={soumettre}
-          className="mt-6 border border-charbon/15 rounded-lg p-4 bg-white/60 grid sm:grid-cols-2 gap-4 max-w-2xl"
+          className="mt-6 border border-charbon/15 rounded-lg p-4 bg-carte/60 grid sm:grid-cols-2 gap-4 max-w-2xl"
         >
-          <h2 className="font-titre text-xl font-bold sm:col-span-2">Modifier le compte</h2>
+          <h2 className="font-titre text-xl font-bold sm:col-span-2">{t("Modifier le compte")}</h2>
 
           <div>
-            <label htmlFor="nom" className="block text-sm font-medium mb-1">Nom</label>
+            <label htmlFor="nom" className="block text-sm font-medium mb-1">{t("Nom")}</label>
             <input
               id="nom" required maxLength={100} value={edition.nom}
               onChange={(e) => setEdition({ ...edition, nom: e.target.value })}
@@ -74,7 +75,7 @@ export default function GestionServeurs() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">E-mail</label>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">{t("E-mail")}</label>
             <input
               id="email" type="email" required value={edition.email}
               onChange={(e) => setEdition({ ...edition, email: e.target.value })}
@@ -83,21 +84,21 @@ export default function GestionServeurs() {
           </div>
 
           <div>
-            <label htmlFor="role" className="block text-sm font-medium mb-1">Rôle</label>
+            <label htmlFor="role" className="block text-sm font-medium mb-1">{t("Rôle")}</label>
             <select
               id="role" value={edition.role}
               onChange={(e) => setEdition({ ...edition, role: e.target.value })}
               className={saisie}
             >
               {ROLES.map((r) => (
-                <option key={r.cle} value={r.cle}>{r.libelle}</option>
+                <option key={r.cle} value={r.cle}>{t(r.libelle)}</option>
               ))}
             </select>
           </div>
 
           <div>
             <label htmlFor="mdp" className="block text-sm font-medium mb-1">
-              Nouveau mot de passe (facultatif)
+              {t("Nouveau mot de passe (facultatif)")}
             </label>
             <input
               id="mdp" type="password" minLength={8} value={edition.mot_de_passe}
@@ -117,15 +118,15 @@ export default function GestionServeurs() {
           <div className="flex gap-3 sm:col-span-2">
             <button
               type="submit" disabled={enregistrer.isPending}
-              className="bg-safran text-charbon font-medium rounded-md px-4 py-2 hover:brightness-95 disabled:opacity-50"
+              className="bg-safran text-sur-safran font-medium rounded-md px-4 py-2 hover:brightness-95 disabled:opacity-50"
             >
-              Enregistrer
+              {t("Enregistrer")}
             </button>
             <button
               type="button" onClick={() => setEdition(null)}
               className="border border-charbon/30 rounded-md px-4 py-2 text-sm"
             >
-              Annuler
+              {t("Annuler")}
             </button>
           </div>
         </form>
@@ -139,26 +140,26 @@ export default function GestionServeurs() {
         </ul>
       )}
 
-      {isLoading && <p className="text-charbon/70 mt-8">Chargement…</p>}
-      {isError && <p className="text-red-700 mt-8">Impossible de charger les serveurs.</p>}
+      {isLoading && <p className="text-charbon/70 mt-8">{t("Chargement…")}</p>}
+      {isError && <p className="text-red-700 mt-8">{t("Impossible de charger les serveurs.")}</p>}
 
       {serveurs && (
         <ul className="space-y-2 mt-8">
           {serveurs.map((s) => (
             <li
               key={s.id}
-              className="border border-charbon/15 rounded-lg p-3 bg-white/60 flex flex-wrap items-center justify-between gap-3"
+              className="border border-charbon/15 rounded-lg p-3 bg-carte/60 flex flex-wrap items-center justify-between gap-3"
             >
               <div>
                 <p className="font-medium">
                   {s.nom}
                   <span className="ml-2">
                     <Pastille ton={s.role === "gerant" ? "ambre" : "neutre"}>
-                      {libelleRole(s.role)}
+                      {t(libelleRole(s.role))}
                     </Pastille>
                   </span>
                   {s.id === moi?.id && (
-                    <span className="ml-2 text-xs text-charbon/60">(vous)</span>
+                    <span className="ml-2 text-xs text-charbon/60">{t("(vous)")}</span>
                   )}
                 </p>
                 <p className="text-sm text-charbon/70">{s.email}</p>
@@ -169,15 +170,15 @@ export default function GestionServeurs() {
                   onClick={() => setEdition({ ...s, mot_de_passe: "" })}
                   className="border border-charbon/30 rounded-md px-3 py-1.5 hover:bg-charbon/5"
                 >
-                  Modifier
+                  {t("Modifier")}
                 </button>
                 <button
                   onClick={() => confirmerSuppression(s)}
                   disabled={supprimer.isPending || s.id === moi?.id}
-                  title={s.id === moi?.id ? "Vous ne pouvez pas supprimer votre propre compte" : ""}
+                  title={s.id === moi?.id ? t("Vous ne pouvez pas supprimer votre propre compte") : ""}
                   className="text-red-800 border border-red-700/30 rounded-md px-3 py-1.5 hover:bg-red-50 disabled:opacity-40"
                 >
-                  Supprimer
+                  {t("Supprimer")}
                 </button>
               </div>
             </li>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -5,6 +6,7 @@ import { appliquerRemise, lireCommande, payerCommande } from "../api/commandes";
 import { MODES_PAIEMENT, mad, messagesErreur } from "../lib/statuts";
 
 export default function Addition() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -37,21 +39,21 @@ export default function Addition() {
     },
   });
 
-  if (isLoading) return <p className="text-charbon/70">Chargement…</p>;
+  if (isLoading) return <p className="text-charbon/70">{t("Chargement…")}</p>;
 
   if (isError || !commande)
     return (
       <div>
-        <p className="text-red-700 mb-3">Commande introuvable.</p>
-        <Link to="/" className="underline">Retour au plan de salle</Link>
+        <p className="text-red-700 mb-3">{t("Commande introuvable.")}</p>
+        <Link to="/" className="underline">{t("Retour au plan de salle")}</Link>
       </div>
     );
 
   if (["payee", "annulee"].includes(commande.statut))
     return (
       <div>
-        <p className="mb-3">Cette commande est déjà clôturée.</p>
-        <Link to="/" className="underline">Retour au plan de salle</Link>
+        <p className="mb-3">{t("Cette commande est déjà clôturée.")}</p>
+        <Link to="/" className="underline">{t("Retour au plan de salle")}</Link>
       </div>
     );
 
@@ -62,13 +64,13 @@ export default function Addition() {
   return (
     <section className="max-w-2xl">
       <Link to={`/commandes/${commande.id}`} className="text-sm text-charbon/70 hover:text-charbon">
-        ← Détail de la commande
+        {t("← Détail de la commande")}
       </Link>
       <h1 className="font-titre text-3xl font-bold mt-2">
-        Addition · Table {commande.table?.numero}
+        {t("Addition")} · {t("Table")} {commande.table?.numero}
       </h1>
 
-      <div className="border border-charbon/15 rounded-lg p-4 bg-white/60 mt-6">
+      <div className="border border-charbon/15 rounded-lg p-4 bg-carte/60 mt-6">
         <ul className="space-y-2">
           {commande.lignes.map((l) => (
             <li key={l.menu_id} className="flex justify-between gap-2 text-sm">
@@ -82,21 +84,21 @@ export default function Addition() {
 
         <div className="border-t border-charbon/10 mt-4 pt-3 space-y-1 text-sm">
           <p className="flex justify-between">
-            <span>Sous-total</span>
+            <span>{t("Sous-total")}</span>
             <span>{mad(commande.sous_total)}</span>
           </p>
           {commande.remise > 0 && (
             <p className="flex justify-between">
-              <span>Remise</span>
+              <span>{t("Remise")}</span>
               <span>− {mad(commande.remise)}</span>
             </p>
           )}
           <p className="flex justify-between">
-            <span>TVA (10 %)</span>
+            <span>{t("TVA (10 %)")}</span>
             <span>{mad(commande.tva)}</span>
           </p>
           <p className="flex justify-between font-medium text-lg pt-2">
-            <span>Total à payer</span>
+            <span>{t("Total à payer")}</span>
             <span>{mad(commande.total)}</span>
           </p>
         </div>
@@ -110,7 +112,7 @@ export default function Addition() {
         className="mt-6"
       >
         <label htmlFor="remise" className="block text-sm font-medium mb-1">
-          Remise (MAD)
+          {t("Remise (MAD)")}
         </label>
         <div className="flex gap-3">
           <input
@@ -128,13 +130,13 @@ export default function Addition() {
             disabled={remiseMutation.isPending}
             className="border border-charbon/30 rounded-md px-4 py-2 text-sm hover:bg-charbon/5 disabled:opacity-50"
           >
-            Appliquer
+            {t("Appliquer")}
           </button>
         </div>
       </form>
 
       <fieldset className="mt-6">
-        <legend className="text-sm font-medium mb-2">Mode de paiement</legend>
+        <legend className="text-sm font-medium mb-2">{t("Mode de paiement")}</legend>
         <div className="flex gap-3">
           {MODES_PAIEMENT.map((m) => (
             <label
@@ -151,7 +153,7 @@ export default function Addition() {
                 onChange={() => setMode(m.cle)}
                 className="sr-only"
               />
-              {m.libelle}
+              {t(m.libelle)}
             </label>
           ))}
         </div>
@@ -168,9 +170,9 @@ export default function Addition() {
       <button
         onClick={() => paiement.mutate({ id, mode_paiement: mode })}
         disabled={paiement.isPending}
-        className="w-full mt-6 bg-safran text-charbon font-medium rounded-md py-2.5 hover:brightness-95 disabled:opacity-50"
+        className="w-full mt-6 bg-safran text-sur-safran font-medium rounded-md py-2.5 hover:brightness-95 disabled:opacity-50"
       >
-        {paiement.isPending ? "Paiement…" : `Encaisser ${mad(commande.total)}`}
+        {paiement.isPending ? t("Paiement…") : `${t("Encaisser")} ${mad(commande.total)}`}
       </button>
     </section>
   );

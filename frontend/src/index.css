@@ -7,6 +7,8 @@
   --color-safran-fonce: #9A6812;
   --color-olive: #3F7A2B;
   --color-brique: #B4412D;
+  --color-carte: #FFFFFF;
+  --color-sur-safran: #1F1A16;
   --font-titre: "Fraunces", serif;
   --font-texte: "DM Sans", sans-serif;
 }
@@ -16,8 +18,43 @@ body {
   color: var(--color-charbon);
   font-family: var(--font-texte);
 }
+/* Thème sombre : on redéfinit les variables, tous les composants suivent. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-creme: #14110F;
+  --color-charbon: #F3EDE3;
+  --color-safran-fonce: #E3B45C;
+  --color-olive: #7FD1A0;
+  --color-brique: #F2A097;
+  --color-carte: #1D1916;
+}
+
+[data-theme="dark"] .text-red-700,
+[data-theme="dark"] .text-red-800 {
+  color: #F2A097;
+}
+[data-theme="dark"] .text-emerald-800 {
+  color: #7FD1A0;
+}
+[data-theme="dark"] .hover\:bg-red-50:hover {
+  background: #3A1F1C;
+}
+
+/* Le ticket reste du texte sombre sur papier blanc, même en thème sombre. */
+.ticket {
+  --color-charbon: #1F1A16;
+  --color-safran-fonce: #9A6812;
+  background: white;
+  color: #1F1A16;
+}
+
 /* Impression du ticket : on masque la navigation et les boutons */
 @media print {
+  :root,
+  [data-theme="dark"] {
+    --color-creme: #fff;
+    --color-charbon: #1F1A16;
+  }
   header,
   .no-print {
     display: none !important;

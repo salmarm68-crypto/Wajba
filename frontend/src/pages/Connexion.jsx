@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import { useAuth } from "../context/AuthContext";
 
 export default function Connexion() {
+  const { t } = useTranslation();
   const { serveur, connecter } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -21,7 +23,11 @@ export default function Connexion() {
       await connecter(email, password);
       navigate("/");
     } catch (err) {
-      setErreur(err.response?.data?.message || "Connexion impossible.");
+      setErreur(
+        err.response
+          ? err.response.data?.message || t("Connexion impossible.")
+          : t("Serveur injoignable. Vérifiez que le backend est lancé (php artisan serve).")
+      );
     } finally {
       setChargement(false);
     }
@@ -31,21 +37,21 @@ export default function Connexion() {
     <main className="min-h-screen flex items-center justify-center p-6">
       <form
         onSubmit={soumettre}
-        className="w-full max-w-sm border border-charbon/15 rounded-lg p-8 bg-white/60"
+        className="w-full max-w-sm border border-charbon/15 rounded-lg p-8 bg-carte/60"
       >
         <h1 className="mb-2">
           <Logo grand />
         </h1>
-        <p className="text-charbon/70 mb-6">Connectez-vous à votre compte.</p>
+        <p className="text-charbon/70 mb-6">{t("Connectez-vous à votre compte.")}</p>
 
-        <label className="block text-sm font-medium mb-1" htmlFor="email">E-mail</label>
+        <label className="block text-sm font-medium mb-1" htmlFor="email">{t("E-mail")}</label>
         <input
           id="email" type="email" required value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border border-charbon/20 rounded-md px-3 py-2 mb-4 bg-transparent"
         />
 
-        <label className="block text-sm font-medium mb-1" htmlFor="password">Mot de passe</label>
+        <label className="block text-sm font-medium mb-1" htmlFor="password">{t("Mot de passe")}</label>
         <input
           id="password" type="password" required value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -56,15 +62,15 @@ export default function Connexion() {
 
         <button
           type="submit" disabled={chargement}
-          className="w-full bg-safran text-charbon font-medium rounded-md py-2 hover:brightness-95 disabled:opacity-60"
+          className="w-full bg-safran text-sur-safran font-medium rounded-md py-2 hover:brightness-95 disabled:opacity-60"
         >
-          {chargement ? "Connexion…" : "Se connecter"}
+          {chargement ? t("Connexion…") : t("Se connecter")}
         </button>
 
         <p className="text-sm text-charbon/70 mt-4 text-center">
           Pas encore de compte ?{" "}
           <Link to="/inscription" className="underline hover:text-charbon">
-            Créer un compte
+            {t("Créer un compte")}
           </Link>
         </p>
       </form>

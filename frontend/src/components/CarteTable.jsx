@@ -1,6 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { mad, STATUTS_COMMANDE } from "../lib/statuts";
-import { depuis } from "../lib/temps";
 import Pastille from "./Pastille";
 
 const STATUTS = {
@@ -9,7 +9,8 @@ const STATUTS = {
   addition_demandee: { libelle: "Addition demandée", ton: "rouge" },
 };
 
-export default function CarteTable({ table, maintenant }) {
+export default function CarteTable({ table }) {
+  const { t } = useTranslation();
   const statut = STATUTS[table.statut] ?? STATUTS.libre;
   const commande = table.commande_ouverte;
   const libre = table.statut === "libre";
@@ -17,8 +18,8 @@ export default function CarteTable({ table, maintenant }) {
   const cadre = libre
     ? "border-dashed border-charbon/25 bg-transparent"
     : table.statut === "addition_demandee"
-      ? "border-brique/40 bg-white"
-      : "border-charbon/15 bg-white";
+      ? "border-brique/40 bg-carte"
+      : "border-charbon/15 bg-carte";
 
   const carte = (
     <div className={`border rounded-xl p-5 h-full hover:border-safran ${cadre}`}>
@@ -27,21 +28,19 @@ export default function CarteTable({ table, maintenant }) {
         <Pastille ton={statut.ton}>{statut.libelle}</Pastille>
       </div>
       <p className="text-sm text-charbon/60 mt-3">
-        {table.capacite} {table.capacite > 1 ? "couverts" : "couvert"}
+        {table.capacite} {table.capacite > 1 ? t("couverts") : t("couvert")}
       </p>
 
       <div className="text-sm mt-4">
         {commande ? (
           <>
-            <p className="font-medium">
-              {depuis(commande.created_at, maintenant)} · {mad(commande.total)}
-            </p>
+            <p className="font-medium">{mad(commande.total)}</p>
             <p className="text-charbon/60 mt-0.5">
-              {STATUTS_COMMANDE[commande.statut] ?? commande.statut} · {commande.serveur}
+              {t(STATUTS_COMMANDE[commande.statut] ?? commande.statut)} · {commande.serveur}
             </p>
           </>
         ) : (
-          libre && <p className="font-medium">Disponible</p>
+          libre && <p className="font-medium">{t("Disponible")}</p>
         )}
       </div>
     </div>

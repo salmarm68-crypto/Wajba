@@ -21,6 +21,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Données déjà créées (démarrage répété sous Docker) : on ne fait rien.
+        if (Serveur::query()->exists()) {
+            return;
+        }
+
         $gerant = Serveur::create([
             'nom' => 'Karim Benali', 'email' => 'gerant@wajba.ma',
             'mot_de_passe' => 'password123', 'role' => Role::Gerant,

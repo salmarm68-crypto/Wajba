@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { STATUTS_COMMANDE } from "../lib/statuts";
 import Pastille from "./Pastille";
 
@@ -11,5 +12,6 @@ const TONS = {
 };
 
 export default function BadgeStatut({ statut }) {
-  return <Pastille ton={TONS[statut] ?? "neutre"}>{STATUTS_COMMANDE[statut] ?? statut}</Pastille>;
+  const { t } = useTranslation();
+  return <Pastille ton={TONS[statut] ?? "neutre"}>{t(STATUTS_COMMANDE[statut] ?? statut)}</Pastille>;
 }

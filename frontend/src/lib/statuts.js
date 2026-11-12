@@ -1,5 +1,10 @@
+import i18n, { localeDates } from "../i18n";
+
+export const TAUX_TVA = 0.1;
+
+// 412,50 MAD (français) ou 412.50 MAD (anglais)
 export const mad = (valeur) =>
-  `${Number(valeur ?? 0).toLocaleString("fr-FR", {
+  `${Number(valeur ?? 0).toLocaleString(localeDates(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })} MAD`;
@@ -28,9 +33,9 @@ export const MODES_PAIEMENT = [
 // Messages d'erreur renvoyés par l'API Laravel (422, 403, ...).
 export const messagesErreur = (erreur, defaut = "Une erreur est survenue.") => {
   const donnees = erreur?.response?.data;
-  if (!donnees) return [defaut];
+  if (!donnees) return [i18n.t(defaut)];
   const details = donnees.errors ? Object.values(donnees.errors).flat() : [];
-  return details.length > 0 ? details : [donnees.message ?? defaut];
+  return details.length > 0 ? details : [donnees.message ?? i18n.t(defaut)];
 };
 
 export const CATEGORIES = [

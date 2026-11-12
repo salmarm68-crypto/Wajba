@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import App from "./App";
 import "./index.css";
+import "./i18n";
+import { initialiserTheme } from "./lib/theme";
+
+initialiserTheme();
 
 const queryClient = new QueryClient();
 

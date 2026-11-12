@@ -1,9 +1,12 @@
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
+import Preferences from "./Preferences";
 import Pastille from "./Pastille";
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const { serveur, deconnecter } = useAuth();
 
   const liens = [
@@ -22,10 +25,10 @@ export default function Navbar() {
 
   return (
     <header className="border-b border-charbon/15 bg-creme">
-      <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
+      <div className="max-w-6xl mx-auto px-6 py-3 flex flex-nowrap items-center justify-between gap-4">
+        <div className="flex items-center gap-5 shrink-0">
           <Logo />
-          <nav className="flex flex-wrap items-center gap-5">
+          <nav className="flex flex-nowrap items-center gap-4 whitespace-nowrap">
             {liens.map((lien) => (
               <NavLink
                 key={lien.to}
@@ -39,24 +42,25 @@ export default function Navbar() {
                   }`
                 }
               >
-                {lien.libelle}
+                {t(lien.libelle)}
               </NavLink>
             ))}
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-charbon/70 hidden sm:block">
+        <div className="flex items-center gap-3 flex-nowrap whitespace-nowrap shrink-0">
+          <Preferences />
+          <p className="text-sm text-charbon/70 hidden lg:block">
             {serveur.nom ?? serveur.email}
             <span className="ml-2">
-              <Pastille>{serveur.role}</Pastille>
+              <Pastille>{serveur.role === "gerant" ? "Gérant" : "Serveur"}</Pastille>
             </span>
           </p>
           <button
             onClick={deconnecter}
             className="border border-charbon/30 rounded-md px-3 py-1.5 text-sm hover:bg-charbon/5"
           >
-            Se déconnecter
+            {t("Se déconnecter")}
           </button>
         </div>
       </div>

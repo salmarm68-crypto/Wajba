@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { avancerStatut, listerCommandes } from "../api/commandes";
 import { ACTION_SUIVANTE, messagesErreur } from "../lib/statuts";
+import { localeDates } from "../i18n";
 
 const COLONNES = [
   { statut: "en_attente", titre: "En attente" },
@@ -10,9 +12,10 @@ const COLONNES = [
 ];
 
 const heure = (iso) =>
-  iso ? new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "";
+  iso ? new Date(iso).toLocaleTimeString(localeDates(), { hour: "2-digit", minute: "2-digit" }) : "";
 
 export default function Cuisine() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   // Rafraîchissement automatique toutes les 5 secondes (polling).
@@ -30,14 +33,14 @@ export default function Cuisine() {
     },
   });
 
-  if (isLoading) return <p className="text-charbon/70">Chargement de la cuisine…</p>;
-  if (isError) return <p className="text-red-700">Impossible de charger les commandes.</p>;
+  if (isLoading) return <p className="text-charbon/70">{t("Chargement de la cuisine…")}</p>;
+  if (isError) return <p className="text-red-700">{t("Impossible de charger les commandes.")}</p>;
 
   return (
     <section>
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
-        <h1 className="font-titre text-3xl font-bold">Cuisine</h1>
-        <p className="text-sm text-charbon/70">Mise à jour automatique toutes les 5 secondes</p>
+        <h1 className="font-titre text-3xl font-bold">{t("Cuisine")}</h1>
+        <p className="text-sm text-charbon/70">{t("Mise à jour automatique toutes les 5 secondes")}</p>
       </div>
 
       {avancer.isError && (
@@ -57,19 +60,19 @@ export default function Cuisine() {
           return (
             <div key={colonne.statut}>
               <h2 className="font-titre text-xl font-bold mb-3">
-                {colonne.titre}{" "}
+                {t(colonne.titre)}{" "}
                 <span className="text-sm font-normal text-charbon/70">({liste.length})</span>
               </h2>
 
               {liste.length === 0 ? (
-                <p className="text-sm text-charbon/60">Aucune commande.</p>
+                <p className="text-sm text-charbon/60">{t("Aucune commande.")}</p>
               ) : (
                 <ul className="space-y-3">
                   {liste.map((c) => (
-                    <li key={c.id} className="border border-charbon/15 rounded-lg p-3 bg-white/60">
+                    <li key={c.id} className="border border-charbon/15 rounded-lg p-3 bg-carte/60">
                       <div className="flex justify-between items-baseline">
                         <Link to={`/commandes/${c.id}`} className="font-titre text-lg font-bold">
-                          Table {c.table?.numero}
+                          {t("Table")} {c.table?.numero}
                         </Link>
                         <span className="text-xs text-charbon/70">
                           n° {c.id} · {heure(c.created_at)}
@@ -88,9 +91,9 @@ export default function Cuisine() {
                       <button
                         onClick={() => avancer.mutate(c.id)}
                         disabled={avancer.isPending}
-                        className="w-full mt-3 bg-safran text-charbon text-sm font-medium rounded-md py-1.5 hover:brightness-95 disabled:opacity-50"
+                        className="w-full mt-3 bg-safran text-sur-safran text-sm font-medium rounded-md py-1.5 hover:brightness-95 disabled:opacity-50"
                       >
-                        {ACTION_SUIVANTE[c.statut]}
+                        {t(ACTION_SUIVANTE[c.statut])}
                       </button>
                     </li>
                   ))}
