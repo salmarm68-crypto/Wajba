@@ -5,9 +5,21 @@ Projet de module **Programmation Web Dynamique S5 (IL)** — Faculté des Scienc
 
 ## Technologies
 
-- **Frontend** : React (dossier `frontend/`)
+- **Frontend** : React (Vite), React Router, TanStack Query, Tailwind CSS, Axios, react-i18next (dossier `frontend/`)
 - **Backend** : Laravel 12 + Laravel Sanctum (dossier `backend/`)
 - **Base de données** : MySQL
+- **Tests** : PHPUnit (Laravel) et Postman
+- **Conteneurs** : Docker et Docker Compose
+
+## Fonctionnalités
+
+- Authentification (inscription, connexion, déconnexion) avec deux rôles : **Serveur** et **Gérant**.
+- Plan de salle avec le statut de chaque table (libre, en service, addition demandée).
+- Prise de commande, modification, annulation et suivi des statuts (en attente, en préparation, prête, servie).
+- Écran cuisine avec actualisation automatique.
+- Addition (remise, TVA 10 %), paiement espèces ou carte, ticket imprimable, libération de la table.
+- Gérant : gestion du menu, des tables et des serveurs, tableau de bord.
+- Interface en **français** (par défaut) ou en **anglais**, thème **clair** (par défaut) ou **sombre** : le choix est mémorisé dans le navigateur.
 
 ## Structure du dépôt
 
@@ -15,7 +27,7 @@ Projet de module **Programmation Web Dynamique S5 (IL)** — Faculté des Scienc
 Projet-web28/
 ├── frontend/            (React, avec son Dockerfile)
 ├── backend/             (Laravel, avec son Dockerfile)
-├── docker-compose.yml   (MySQL + API + interface)
+├── docker-compose.yml   (MySQL + API + interface, lancement avec Docker)
 └── README.md
 ```
 
@@ -42,7 +54,7 @@ Commandes utiles :
 ```bash
 docker compose up -d --build                  # lancer en arrière-plan
 docker compose logs -f backend                # suivre les journaux de l'API
-docker compose exec backend php artisan test  # lancer les 33 tests Laravel
+docker compose exec backend php artisan test  # tests Laravel (SQLite en mémoire : la base de démonstration n'est pas touchée)
 docker compose down                           # arrêter
 docker compose down -v                        # arrêter et effacer la base (repartir de zéro)
 ```
